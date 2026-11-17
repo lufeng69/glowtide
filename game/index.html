@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLOWTIDE · 萤光潮 — 深海生存</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #01060d; overflow: hidden; }
+  body { font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: #dff3ff; }
+  #wrap { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+  #stage { position: relative; width: min(100vw, calc(100vh * 16 / 9)); aspect-ratio: 16 / 9; }
+  canvas { width: 100%; height: 100%; display: block; background: #04101f; }
+  .hud { position: absolute; pointer-events: none; user-select: none; }
+  #hud-tl { top: 14px; left: 16px; width: 260px; }
+  .bar-label { font-size: 12px; letter-spacing: 2px; color: #9fd8ef; display: flex; justify-content: space-between; }
+  .bar { height: 14px; background: rgba(0,0,0,.55); border: 1px solid rgba(140,220,255,.4); border-radius: 7px; overflow: hidden; margin: 2px 0 8px; }
+  .bar > div { height: 100%; border-radius: 6px; transition: width .15s; }
+  #hp-fill { background: linear-gradient(90deg, #ff5d7a, #ff8fa3); width: 100%; }
+  #en-fill { background: linear-gradient(90deg, #37c8e0, #7df9ff); width: 0%; }
+  #hud-tr { top: 14px; right: 16px; text-align: right; }
+  #score { font-size: 38px; font-weight: 800; color: #ffd76a; text-shadow: 0 0 14px rgba(255,215,106,.6); line-height: 1; }
+  #combo { font-size: 17px; font-weight: 700; color: #7df9ff; min-height: 22px; }
+  #combo.hot { color: #ff9f43; }
+  #wave { font-size: 15px; color: #9fd8ef; letter-spacing: 2px; }
+  #hud-bc { bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 18px; font-size: 13px; color: #9fd8ef; }
+  #hud-bc span { background: rgba(0,0,0,.45); padding: 4px 10px; border-radius: 10px; border: 1px solid rgba(140,220,255,.25); }
+  #hud-bc .ready { color: #ffd76a; border-color: rgba(255,215,106,.6); }
+  #banner { top: 34%; left: 50%; transform: translate(-50%, -50%) scale(.9); font-size: 64px; font-weight: 900; letter-spacing: 14px; color: #eafcff; text-shadow: 0 0 30px rgba(125,249,255,.8); opacity: 0; transition: opacity .3s, transform .3s; }
+  #banner.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: rgba(2, 10, 22, .72); backdrop-filter: blur(2px); z-index: 5; }
+  .hidden { display: none !important; }
+  h1.title { font-size: 84px; font-weight: 900; letter-spacing: 10px; color: #ffd76a; text-shadow: 0 0 34px rgba(255,215,106,.75), 0 0 90px rgba(55,224,200,.5); }
+  .subtitle { font-size: 20px; color: #9ff5e0; letter-spacing: 6px; margin: 6px 0 18px; }
+  .desc { font-size: 15px; line-height: 1.9; color: #cfeeff; max-width: 640px; }
+  .desc b { color: #ffd76a; }
+  .btn { pointer-events: auto; cursor: pointer; margin-top: 26px; font-size: 20px; font-weight: 700; letter-spacing: 4px; color: #04101f; background: linear-gradient(90deg, #ffd76a, #ffb35c); border: none; border-radius: 12px; padding: 14px 44px; box-shadow: 0 0 24px rgba(255,215,106,.5); }
+  .btn:hover { filter: brightness(1.1); }
+  .btn.ghost { background: transparent; color: #9fd8ef; border: 1px solid rgba(140,220,255,.5); box-shadow: none; font-size: 15px; padding: 10px 26px; }
+  #best-score { margin-top: 16px; font-size: 14px; color: #9fd8ef; letter-spacing: 2px; }
+  #upgrade-cards { display: flex; gap: 18px; margin-top: 22px; }
+  .card { pointer-events: auto; cursor: pointer; width: 210px; padding: 22px 16px; background: rgba(8, 34, 56, .9); border: 1px solid rgba(125,249,255,.45); border-radius: 14px; transition: transform .12s, border-color .12s; }
+  .card:hover { transform: translateY(-6px); border-color: #ffd76a; }
+  .card-key { font-size: 12px; color: #7df9ff; border: 1px solid #7df9ff; border-radius: 6px; display: inline-block; padding: 2px 8px; margin-bottom: 10px; }
+  .card-name { font-size: 20px; font-weight: 800; color: #ffd76a; margin-bottom: 8px; }
+  .card-desc { font-size: 14px; color: #cfeeff; line-height: 1.6; }
+  h2 { font-size: 40px; letter-spacing: 6px; color: #eafcff; }
+  .end-stats { display: flex; gap: 34px; margin-top: 20px; }
+  .stat { text-align: center; }
+  .stat .num { font-size: 36px; font-weight: 800; color: #ffd76a; }
+  .stat .lab { font-size: 13px; color: #9fd8ef; letter-spacing: 2px; margin-top: 4px; }
+  #mute-btn { position: absolute; bottom: 12px; right: 14px; z-index: 6; pointer-events: auto; cursor: pointer; background: rgba(0,0,0,.45); color: #9fd8ef; border: 1px solid rgba(140,220,255,.3); border-radius: 10px; padding: 5px 10px; font-size: 12px; }
+  .hint { margin-top: 14px; font-size: 13px; color: #7fb8cf; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <canvas id="game" width="1280" height="720"></canvas>
+    <div class="hud" id="hud-tl">
+      <div class="bar-label"><span>❤ 血量</span><span id="hp-text">100 / 100</span></div>
+      <div class="bar"><div id="hp-fill"></div></div>
+      <div class="bar-label"><span>✦ 光能</span><span id="en-text">0 / 100</span></div>
+      <div class="bar"><div id="en-fill"></div></div>
+    </div>
+    <div class="hud" id="hud-tr">
+      <div id="score">0</div>
+      <div id="combo"></div>
+      <div id="wave">第 1 波</div>
+    </div>
+    <div class="hud" id="hud-bc">
+      <span id="dash-cd">冲刺就绪 [Shift]</span>
+      <span id="burst-hint">潮汐爆裂 0%</span>
+    </div>
+    <div class="hud" id="banner"></div>
+
+    <div class="screen" id="title-screen">
+      <h1 class="title">GLOWTIDE</h1>
+      <div class="subtitle">萤 光 潮 · 深 海 生 存</div>
+      <div class="desc">
+        深海 2000 米，你是一艘萤火艇，以光为武器。<br>
+        <b>WASD</b> 移动 · <b>鼠标</b> 瞄准，按住左键开火 · <b>Shift</b> 冲刺<br>
+        <b>空格</b> 潮汐爆裂（光能满 100） · <b>P</b> 暂停 · <b>M</b> 静音<br>
+        击杀掉落光珠，攒连击冲高分；每波结束三选一升级，活得越久，潮水越凶。
+      </div>
+      <button class="btn" id="start-btn">▶ 开始潜航</button>
+      <div id="best-score">深海 2000 米 · 活下去</div>
+    </div>
+
+    <div class="screen hidden" id="upgrade-screen">
+      <h2>波次结算 · 选择升级</h2>
+      <div class="hint" id="upgrade-score"></div>
+      <div id="upgrade-cards"></div>
+      <div class="hint">点击卡片，或按 1 / 2 / 3 选择</div>
+    </div>
+
+    <div class="screen hidden" id="end-screen">
+      <h2>潮水退去</h2>
+      <div class="end-stats">
+        <div class="stat"><div class="num" id="end-score">0</div><div class="lab">得分</div></div>
+        <div class="stat"><div class="num" id="end-wave">1</div><div class="lab">到达波次</div></div>
+        <div class="stat"><div class="num" id="end-kills">0</div><div class="lab">击杀</div></div>
+        <div class="stat"><div class="num" id="end-combo">×1</div><div class="lab">最高连击</div></div>
+      </div>
+      <div class="hint" id="end-best"></div>
+      <button class="btn" id="restart-btn">↻ 再潜一次 (R)</button>
+    </div>
+
+    <div class="screen hidden" id="pause-screen">
+      <h2>已暂停</h2>
+      <div class="hint">按 P 或 Esc 继续</div>
+      <button class="btn" id="resume-btn">继续</button>
+    </div>
+
+    <button id="mute-btn">🔊 音效 (M)</button>
+  </div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
