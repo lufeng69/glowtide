@@ -66,9 +66,15 @@ export function render(ctx, S, world) {
   const p = S.player;
   if (p && S.state !== 'over') drawPlayer(ctx, p, S.time);
 
-  // bullets
+  // bullets: tracer streak + hot core so fire reads at a glance
   for (const b of S.bullets) {
-    drawGlow(ctx, b.x, b.y, 14, '#ffe9a8', 0.9);
+    ctx.strokeStyle = 'rgba(255,233,168,0.55)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(b.x - b.vx * 0.022, b.y - b.vy * 0.022);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+    drawGlow(ctx, b.x, b.y, 16, '#ffe9a8', 0.9);
     ctx.fillStyle = '#fff6cf';
     ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, TAU); ctx.fill();
   }
@@ -86,9 +92,18 @@ export function render(ctx, S, world) {
   }
   ctx.globalAlpha = 1;
 
-  // shockwave rings
+  // shockwave rings: a soft filled energy disc plus the bright rim,
+  // so a burst reads as a shockwave, not an empty wire circle
   for (const r of S.rings) {
-    ctx.globalAlpha = Math.max(0, r.life / r.maxLife) * 0.9;
+    const fade = Math.max(0, r.life / r.maxLife);
+    const g = ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, Math.max(1, r.r));
+    g.addColorStop(0, r.color + '30');
+    g.addColorStop(0.75, r.color + '14');
+    g.addColorStop(1, r.color + '00');
+    ctx.globalAlpha = fade;
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(r.x, r.y, Math.max(1, r.r), 0, TAU); ctx.fill();
+    ctx.globalAlpha = fade * 0.9;
     ctx.strokeStyle = r.color;
     ctx.lineWidth = 4;
     ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, TAU); ctx.stroke();

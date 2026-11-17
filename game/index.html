@@ -29,6 +29,7 @@
   #banner { top: 34%; left: 50%; transform: translate(-50%, -50%) scale(.9); font-size: 64px; font-weight: 900; letter-spacing: 14px; color: #eafcff; text-shadow: 0 0 30px rgba(125,249,255,.8); opacity: 0; transition: opacity .3s, transform .3s; }
   #banner.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: rgba(2, 10, 22, .72); backdrop-filter: blur(2px); z-index: 5; }
+  #title-screen { background: rgba(2, 10, 22, .58); }
   .hidden { display: none !important; }
   h1.title { font-size: 84px; font-weight: 900; letter-spacing: 10px; color: #ffd76a; text-shadow: 0 0 34px rgba(255,215,106,.75), 0 0 90px rgba(55,224,200,.5); }
   .subtitle { font-size: 20px; color: #9ff5e0; letter-spacing: 6px; margin: 6px 0 18px; }
@@ -39,7 +40,7 @@
   .btn.ghost { background: transparent; color: #9fd8ef; border: 1px solid rgba(140,220,255,.5); box-shadow: none; font-size: 15px; padding: 10px 26px; }
   #best-score { margin-top: 16px; font-size: 14px; color: #9fd8ef; letter-spacing: 2px; }
   #upgrade-cards { display: flex; gap: 18px; margin-top: 22px; }
-  .card { pointer-events: auto; cursor: pointer; width: 210px; padding: 22px 16px; background: rgba(8, 34, 56, .9); border: 1px solid rgba(125,249,255,.45); border-radius: 14px; transition: transform .12s, border-color .12s; }
+  .card { pointer-events: auto; cursor: pointer; width: 210px; padding: 22px 16px; background: rgba(8, 34, 56, .9); border: 1px solid rgba(125,249,255,.45); border-radius: 14px; box-shadow: 0 0 22px rgba(55,224,200,.18); transition: transform .12s, border-color .12s; }
   .card:hover { transform: translateY(-6px); border-color: #ffd76a; }
   .card-key { font-size: 12px; color: #7df9ff; border: 1px solid #7df9ff; border-radius: 6px; display: inline-block; padding: 2px 8px; margin-bottom: 10px; }
   .card-name { font-size: 20px; font-weight: 800; color: #ffd76a; margin-bottom: 8px; }

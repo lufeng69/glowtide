@@ -23,7 +23,7 @@ export function buildWave(wave) {
   const push = (type, count, elite = false) => {
     for (let i = 0; i < count; i++) list.push({ type, elite });
   };
-  const urchins = 6 + (wave - 1) * 3;
+  const urchins = 8 + (wave - 1) * 3;
   push('urchin', urchins);
   if (wave >= 2) push('jelly', 1 + Math.floor(wave / 2));
   if (wave >= 3) push('eel', 1 + Math.floor((wave - 1) / 2));
@@ -54,13 +54,13 @@ export function updateWaves(S, dt) {
   if (S.spawnQueue.length > 0) {
     S.spawnTimer -= dt;
     if (S.spawnTimer <= 0) {
-      // spawn in small bursts; later waves come faster
-      const burst = S.wave >= 4 ? 2 : 1;
+      // spawn in small bursts; later waves come faster and in pairs
+      const burst = S.wave >= 3 ? 2 : 1;
       for (let i = 0; i < burst && S.spawnQueue.length > 0; i++) {
         const s = S.spawnQueue.shift();
         spawnAtEdge(S, s.type, s.elite);
       }
-      S.spawnTimer = Math.max(0.35, 1.1 - S.wave * 0.06);
+      S.spawnTimer = Math.max(0.4, 0.95 - S.wave * 0.07);
     }
   } else if (S.enemies.length === 0) {
     S.waveActive = false;

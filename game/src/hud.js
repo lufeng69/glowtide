@@ -21,7 +21,16 @@ export class Hud {
     this.endEl = doc.getElementById('end-screen');
     this.pauseEl = doc.getElementById('pause-screen');
     this.bestEl = doc.getElementById('best-score');
+    this.chromeEls = ['hud-tl', 'hud-tr', 'hud-bc', 'banner']
+      .map((id) => doc.getElementById(id)).filter(Boolean);
     this._bannerText = '';
+  }
+
+  // Full-screen overlays (title / upgrade / game over) sit on a dimmed
+  // backdrop; the HUD bars bleeding through behind them looked sloppy in
+  // screenshots, so chrome hides whenever such a screen is up.
+  setChromeVisible(v) {
+    for (const el of this.chromeEls) el.classList.toggle('hidden', !v);
   }
 
   update(S) {
@@ -58,6 +67,9 @@ export class Hud {
     for (const s of [this.titleEl, this.upgradeEl, this.endEl, this.pauseEl]) {
       if (s) s.classList.toggle('hidden', s !== el);
     }
+    // pause keeps the HUD (the run is still live underneath); the other
+    // full screens hide it
+    this.setChromeVisible(!el || el === this.pauseEl);
   }
   hideScreens() { this.showOnly(null); }
 

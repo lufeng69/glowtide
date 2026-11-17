@@ -86,6 +86,9 @@ function step(dt) {
   const res = updateWaves(S, dt);
   if (res === 'clear') {
     S.player.hp = clamp(S.player.hp + 20, 0, S.player.maxHp);
+    // wave-clear celebration: a gold ring + sparks on the player
+    addRing(S, S.player.x, S.player.y, '#ffd76a', 200);
+    spawnExplosion(S, S.player.x, S.player.y, '#ffd76a', 18, 220);
     upgradeChoices = pickUpgrades(S.rng, 3);
     S.state = 'upgrade';
     sound.waveClear();
@@ -216,6 +219,8 @@ if (SHOT) {
   spawnEnemy(S, 'urchin', false, 300, 260);
   spawnEnemy(S, 'jelly', false, 950, 220);
   spawnEnemy(S, 'eel', false, 880, 500);
+  spawnEnemy(S, 'mother', false, 220, 520);
+  spawnEnemy(S, 'urchin', false, 640, 180);
   hud.showTitle(S.best);
 }
 

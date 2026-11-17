@@ -107,7 +107,7 @@ export function hurtEnemy(S, e, dmg, angle) {
   e.hp -= dmg;
   e.flash = 0.12;
   S.stats.hits++;
-  addText(S, e.x + S.rng.range(-8, 8), e.y - e.r, String(Math.round(dmg)), '#ffe9a8', 14);
+  addText(S, e.x + S.rng.range(-8, 8), e.y - e.r, String(Math.round(dmg)), '#ffe9a8', 12);
   spawnExplosion(S, e.x, e.y, e.color, 3, 90);
   if (e.hp <= 0) killEnemy(S, e, angle);
 }
@@ -122,7 +122,7 @@ export function killEnemy(S, e, angle) {
   if (S.combo > S.maxCombo) S.maxCombo = S.combo;
   const gained = e.score * comboMult(S);
   S.score += gained;
-  addText(S, e.x, e.y - e.r - 8, '+' + gained, '#ffd76a', 17);
+  addText(S, e.x, e.y - e.r - 26, '+' + gained, '#ffd76a', 18);
   spawnExplosion(S, e.x, e.y, e.color, e.elite ? 26 : 14, e.elite ? 240 : 170);
   addRing(S, e.x, e.y, e.color, e.r + 26);
   dropOrbs(S, e.x, e.y, e.orbs);
@@ -362,7 +362,7 @@ export function updateOrbs(S, dt, sound) {
       }
       if (d < p.r + o.r + 4) {
         S.orbs.splice(i, 1);
-        p.energy = clamp(p.energy + 8 * p.lumenGain, 0, 100);
+        p.energy = clamp(p.energy + 10 * p.lumenGain, 0, 100);
         if (sound) sound.pickup(S.combo);
         continue;
       }
